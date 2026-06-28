@@ -33,6 +33,8 @@ class GestureDetector:
             gesture_name = "Point"
         elif fingers == [0, 1, 1, 0, 0]:
             gesture_name = "Peace"
+        elif fingers == [1, 1, 0, 0, 0]:           # ✅ ADDED THIS LINE
+            gesture_name = "L-Sign / Pinch Ready"  # ✅ ADDED THIS LINE
         elif total == 5:
             gesture_name = "Open Palm"
         elif fingers[0] == 1 and total == 1:
