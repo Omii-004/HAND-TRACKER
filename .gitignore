@@ -7,3 +7,6 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+
+# Ignore Jupyter Notebook checkpoints
+gesture_dataset.csv
