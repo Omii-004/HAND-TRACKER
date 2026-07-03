@@ -17,7 +17,10 @@ def hand_tracking_worker(input_queue, output_queue):
     print("[SYSTEM] Starting AI Worker Process...")
     tracker = HandTracker()
     gesture = GestureDetector()
-    motion = MotionDetector(swipe_threshold=200, zoom_threshold=40, cooldown_seconds=2.5)
+    
+    # ✅ UPDATE: Removed old geometric thresholds. Now it just takes the cooldown!
+    motion = MotionDetector(cooldown_seconds=2.5) 
+    
     logger = DataLogger()
     sys_ctrl = SystemController()
 
@@ -56,20 +59,24 @@ def hand_tracking_worker(input_queue, output_queue):
                     else:
                         movement_history[label][fid].clear()
 
-                # Dynamic Motion Routing
-                detected_motion = None
-                if gesture_name in ["Open Palm", "Point"]:
-                    detected_motion = motion.detect_swipe(movement_history[label][8])
-                elif gesture_name == "L-Sign / Pinch Ready":
-                    detected_motion = motion.detect_zoom(
-                        movement_history[label][4], 
-                        movement_history[label][8]   
-                    )
+                # -------------------------
+                # ✅ ML-DRIVEN MOTION DETECTION
+                # -------------------------
+                # Pass both Thumb (ID 4) and Index (ID 8) directly to the ML model
+                detected_motion = motion.detect_motion(
+                    movement_history[label][4], 
+                    movement_history[label][8]
+                )
                     
+                # Trigger OS Actions and Data Logging
                 if detected_motion:
                     active_swipe = detected_motion
                     swipe_display_timer = 20
+                    
+                    # Log the ML output to your CSV
                     logger.log_sequence(active_swipe, movement_history[label][8])
+                    
+                    # Trigger the actual system keyboard/mouse action
                     sys_ctrl.trigger_action(active_swipe)
 
                 y_pos = 80 if label == "Right" else 120
@@ -100,7 +107,6 @@ def hand_tracking_worker(input_queue, output_queue):
                     cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
         # Send the fully processed frame back to the main thread for display
-        # We clear the queue first if it's full to prevent lagging
         if output_queue.full():
             try:
                 output_queue.get_nowait()
@@ -125,18 +131,12 @@ if __name__ == '__main__':
 
     # Start the worker process
     worker = mp.Process(target=hand_tracking_worker, args=(input_queue, output_queue))
-    worker.daemon = True # Ensures the worker dies if the main program crashes
+    worker.daemon = True 
     worker.start()
 
     cap = cv2.VideoCapture(0)
     
-    # Optional: Force a lower resolution for maximum speed
-    # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-    # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-
-    # Variable to hold the last valid frame in case the AI is still calculating
     display_frame = None
-
     print("[SYSTEM] Main Camera Loop Started.")
 
     while True:
@@ -147,19 +147,18 @@ if __name__ == '__main__':
 
         frame = cv2.flip(frame, 1)
 
-        # 1. Send the newest frame to the AI Worker (if it is ready for one)
+        # 1. Send the newest frame to the AI Worker
         if not input_queue.full():
             input_queue.put(frame)
 
-        # 2. Get the newest processed frame from the AI Worker (if it is done)
+        # 2. Get the newest processed frame from the AI Worker
         if not output_queue.empty():
             display_frame = output_queue.get()
 
-        # 3. Display the frame (either the newest processed one, or the old one if AI is busy)
+        # 3. Display the frame
         if display_frame is not None:
             cv2.imshow("Hand Tracker", display_frame)
         else:
-            # Fallback before the first frame processes
             cv2.imshow("Hand Tracker", frame)
 
         # 4. Exit sequence
@@ -168,7 +167,7 @@ if __name__ == '__main__':
             break
 
     # Clean up processes safely
-    input_queue.put(None) # Send the poison pill
-    worker.join(timeout=2) # Wait for the worker to finish
+    input_queue.put(None) 
+    worker.join(timeout=2) 
     cap.release()
     cv2.destroyAllWindows()

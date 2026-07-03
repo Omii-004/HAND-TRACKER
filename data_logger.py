@@ -1,3 +1,4 @@
+#not using this right now, but keeping it for future reference. This is a simple data logger that saves the hand pose sequences to a CSV file for training a gesture recognition model.
 import csv
 import os
 import time

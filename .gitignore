@@ -1,5 +1,5 @@
 # Ignore virtual environment directories
-venv
+venv/
 .venv
 
 # Ignore Python cache files
@@ -9,4 +9,13 @@ __pycache__/
 *.pyd
 
 # Ignore Jupyter Notebook checkpoints
-gesture_dataset.csv
+*.csv
+
+# Ignore model files
+*.pkl
+
+# Ignore model directories
+models/hand_landmarker.task
+
+# Ignore git cache
+.git
