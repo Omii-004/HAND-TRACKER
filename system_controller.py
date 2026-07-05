@@ -23,24 +23,24 @@ class SystemController:
             pyautogui.press('left')
             print("[ACTION] Triggered Left Key")
             
+        # ✅ THE FIX: Use 'pgup' and 'pgdn' keys instead of buggy mouse scrolling
         elif "swipe up" in clean_motion:
-            # Native PyAutoGUI scroll (Negative moves the page down / scrolls up your view)
-            pyautogui.scroll(-500)
-            print("[ACTION] Scrolled Down")
+            # Swiping hand up pushes the page UP, revealing content below (Page Down)
+            pyautogui.press('pgdn')
+            print("[ACTION] Scrolled Page Down")
             
         elif "swipe down" in clean_motion:
-            pyautogui.scroll(500)
-            print("[ACTION] Scrolled Up")
+            # Swiping hand down pulls the page DOWN, revealing content above (Page Up)
+            pyautogui.press('pgup')
+            print("[ACTION] Scrolled Page Up")
 
         # --- Zoom Actions (Time-Series ML Pipeline) ---
         elif "zoom in" in clean_motion:
-            pyautogui.keyDown('ctrl')
-            pyautogui.scroll(100)
-            pyautogui.keyUp('ctrl')
+            # ✅ THE FIX: Use explicit hotkeys instead of simulated mouse scrolling
+            pyautogui.hotkey('ctrl', '+')
+            # Note: On some keyboards, you may need to use '=' instead of '+'
             print("[ACTION] Zoomed In")
             
         elif "zoom out" in clean_motion:
-            pyautogui.keyDown('ctrl')
-            pyautogui.scroll(-100)
-            pyautogui.keyUp('ctrl')
+            pyautogui.hotkey('ctrl', '-')
             print("[ACTION] Zoomed Out")
