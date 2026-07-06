@@ -51,7 +51,14 @@ while True:
         
         if record_counter >= 30:
             recording = False
-            label = input("Enter motion (e.g., Swipe Right, Zoom In, None): ")
+            
+            # --- 🛡️ FRONT DOOR DATA CLEANING ---
+            while True:
+                label = input("Enter motion (e.g., Swipe Right, Zoom In, None): ").strip()
+                if not label:
+                    print("[ERROR] Label cannot be blank. Please type a valid name.")
+                    continue
+                break
             
             # --- THE OPTIMIZATION: TRANSLATION INVARIANCE ---
             t_start_x, t_start_y = thumb_history[0]

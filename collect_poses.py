@@ -36,22 +36,32 @@ while True:
     if result.hand_landmarks:
         hand = result.hand_landmarks[0]
         frame = draw_hand(frame, hand, w, h)
-        
-        # When 's' is pressed, save the 21 landmarks
-        if cv2.waitKey(1) & 0xFF == ord('s'):
-            label = input("Enter gesture label (e.g., Open Palm, Peace, Spiderman): ")
-            
-            row = []
-            for lm in hand:
-                row.extend([lm.x, lm.y]) # Save raw normalized coordinates
-            row.append(label)
-            
-            with open(csv_file, 'a', newline='') as f:
-                csv.writer(f).writerow(row)
-            print(f"[SAVED] Added 1 sample for: {label}")
 
     cv2.imshow("Data Collector", frame)
-    if cv2.waitKey(1) & 0xFF == 27: break
+    
+    # Process keystrokes exactly once per loop to prevent skipped inputs
+    key = cv2.waitKey(1) & 0xFF
+    
+    if key == ord('s') and result.hand_landmarks:
+        # --- 🛡️ FRONT DOOR DATA CLEANING ---
+        while True:
+            label = input("Enter gesture label (e.g., Open Palm, Peace, Spiderman): ").strip()
+            if not label:
+                print("[ERROR] Label cannot be blank. Please type a valid name.")
+                continue
+            break
+        
+        row = []
+        for lm in hand:
+            row.extend([lm.x, lm.y]) # Save raw normalized coordinates
+        row.append(label)
+        
+        with open(csv_file, 'a', newline='') as f:
+            csv.writer(f).writerow(row)
+        print(f"[SAVED] Added 1 sample for: {label}")
+        
+    elif key == 27: 
+        break
 
 cap.release()
 tracker.close()

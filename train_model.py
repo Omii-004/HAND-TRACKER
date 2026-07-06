@@ -14,8 +14,24 @@ def train_custom_ai(csv_file, model_output_name, tree_depth):
     print(f"\n[SYSTEM] Loading dataset from {csv_file}...")
     df = pd.read_csv(csv_file)
 
-    # ✅ THE FIX: Automatically delete any rows that contain blank/corrupted data
+    # --- 🧹 BACK DOOR DATA CLEANING PIPELINE ---
+    print(f"--- Data Cleaning ---")
+    initial_rows = len(df)
+
+    # 1. Drop completely blank or corrupted rows (NaNs)
     df = df.dropna()
+
+    # 2. Ensure all labels are strings and drop empty/whitespace labels
+    df['label'] = df['label'].astype(str)
+    df = df[df['label'].str.strip() != '']
+
+    # 3. Drop exact duplicate rows (prevents the AI from over-memorizing static frames)
+    df = df.drop_duplicates()
+
+    final_rows = len(df)
+    print(f"Removed {initial_rows - final_rows} bad or duplicate records.")
+    print(f"Final clean dataset size: {final_rows} rows.")
+    print(f"---------------------")
 
     # Split data into Features (X) and Labels (y)
     X = df.drop("label", axis=1)
