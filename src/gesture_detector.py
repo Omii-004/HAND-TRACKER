@@ -5,7 +5,7 @@ import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 
 class GestureDetector:
-    def __init__(self, model_path="custom_gesture_model.pkl"):
+    def __init__(self, model_path="models/pose_model.pkl"):
         print("[SYSTEM] Initializing ML Gesture Classifier...")
         try:
             self.model = joblib.load(model_path)

@@ -1,21 +1,47 @@
-# Ignore virtual environment directories
+# --- Virtual Environments ---
 venv/
-.venv
+.venv/
+ENV/
+env/
 
-# Ignore Python cache files
+# --- Python Cache & Bytecode ---
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
+*.so
+.Python
 
-# Ignore Jupyter Notebook checkpoints
-*.csv
+# --- OS Specific Files ---
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
-# Ignore model files
+# --- IDEs & Text Editors ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- Project Datasets & Logs ---
+datasets/*.csv
+datasets/archive/
+datasets/archive.zip
+!datasets/.gitkeep
+
+# --- Trained Models ---
+models/*.pkl
+models/hand_landmarker.task
+!models/.gitkeep
 *.pkl
 
-# Ignore model directories
-models/hand_landmarker.task
+# --- Temporary / Build Files ---
+*.spec
+dist/
+build/
 
-# Ignore git cache
-.git
+# --- Documentation ---
+TEST.md

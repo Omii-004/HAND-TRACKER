@@ -6,7 +6,7 @@ import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 
 class MotionDetector:
-    def __init__(self, model_path="custom_motion_model.pkl", cooldown_seconds=2.0):
+    def __init__(self, model_path="models/motion_model.pkl", cooldown_seconds=2.0):
         print("[SYSTEM] Initializing ML Motion Classifier...")
         try:
             self.model = joblib.load(model_path)
